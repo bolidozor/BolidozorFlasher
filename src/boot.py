@@ -1,25 +1,48 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
 import webrepl
 import network
+import client
+import neopixel
+import networks
+import machine
+import time
+
+pix = neopixel.NeoPixel(machine.Pin(32, machine.Pin.OUT), 20)
+
+pix[0] = (255, 0, 0, 128)
+pix[1] = (0, 255, 0, 128)
+pix[2] = (0, 0, 255, 128)
+
+pix.write()
 
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
-networks = {
-    b'rdnet_gateway': '2627f68597',
-    b'hvezdarna-svakov': 'Aezoyiosh4eh9Uit',
-    b'Radiobouda': '55aa55aa55'
-}
-for net in sta_if.scan():
-    if net[0] in networks:
-	sta_if.connect(net[0], networks[net[0]])
-	print("Pripojuji se k", net[0])
-	break
-#sta_if.connect('rdnet_gateway', '2627f68597')
-#sta_if.connect('hvezdarna-svakov', 'Aezoyiosh4eh9Uit')
-while not sta_if.isconnected():
-    pass
-webrepl.start()
 
-print("Spoustim skript...")
-import client
-client.rtbolidozor(200)
+print(networks.networks)
+
+while not sta_if.isconnected():
+
+    for i in range(20):
+        pix[i] = (0, 10, 0)
+    pix.write()
+
+    nts = sta_if.scan()
+    for net in nts:
+        if net[0] in networks.networks:
+            print("Pripojuji se k", net[0])
+            sta_if.connect(net[0], networks.networks[net[0]])
+            time.sleep(2)
+            break
+
+    
+    if sta_if.isconnected():
+        for i in range(20):
+            pix[i] = (0, 0, 0)
+        pix.write()
+        try:
+            print("Spoustim skript...")
+            client.rtbolidozor(pix, 0, netm = sta_if)
+            print("Skrpit skoncil...")
+        except Exception as e:
+            print(e)
+            print("Chyba pri spousteni skriptu")

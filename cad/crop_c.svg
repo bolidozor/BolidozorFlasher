@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="93.810562mm"
+   height="69.543953mm"
+   viewBox="0 0 93.810562 69.543953"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="crop_c.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.2810466"
+     inkscape:cx="301.70643"
+     inkscape:cy="61.278021"
+     inkscape:window-width="2490"
+     inkscape:window-height="1536"
+     inkscape:window-x="70"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-20.52258,-37.589921)">
+    <path
+       style="fill:#000000;stroke-width:0.0846667"
+       d="m 38.21781,86.17018 v -3.810881 h 3.717186 3.717186 l 0.05538,0.867834 c 0.03046,0.477308 0.04365,2.182283 0.02931,3.788833 l -0.02606,2.921001 -3.7465,0.02205 -3.7465,0.02205 z"
+       id="path854"
+       sodipodi:nodetypes="ccccsscccc" />
+  </g>
+</svg>

@@ -1,16 +1,24 @@
+#from uwebsockets import client
 import uwebsockets.client
 import os
 import time
 import machine
+import neopixel
 
-print("")
-
-
-
-
-def rtbolidozor(delay = 200):
+def rtbolidozor(pix, delay = 200, netm = None):
     print("Zacatek...")
-    led = machine.Pin(19, machine.Pin.OUT)
+
+    delay = 1000
+    #led = machine.Pin(33, machine.Pin.OUT)
+    led = machine.PWM(machine.Pin(33, machine.Pin.OUT), freq=1000)
+    led.freq(500)
+    led.duty(0)
+
+    time.sleep(1)
+
+    last = time.ticks_ms()
+
+
     beep = machine.Pin(18)
     beep_pwm = machine.PWM(beep)
     beep_pwm.freq(500)
@@ -24,13 +32,15 @@ def rtbolidozor(delay = 200):
     #        msg = websocket.recv()
     #        print(msg)
     
-    a = uwebsockets.client.connect('ws://rtbolidozor.astro.cz:80/ws')
+    a = uwebsockets.client.connect('ws://rtbolidozor.astro.cz/ws/')
+    a.settimeout(0.01)
+    print(a)
     print(a.recv())
     print("prvni prijem dat")
-    a.settimeout(0.05)
 
 
     last = 0
+    light = 1
     while True:
         data = None
         try:
@@ -41,21 +51,34 @@ def rtbolidozor(delay = 200):
         
         if data:
             print('>>', data)
-            #if 'SVAKOV-R12' in data:
-            #print("UP")
             last = time.ticks_ms()
-            led.value(1)
-            beep_pwm.duty(int((2**10)*0.5))
+            light += 1
+            #led.value(1)
+            #beep_pwm.duty(int((2**10)*0.5))
             #print(last)
         
-        else:
-            pass
+        if light > 3:
+            light = 3
+        if light > 1:
+            light -= 0.04
+        if light > 0:
+            light -= 0.01
+        
+        real_light = light
+        if real_light<0: real_light=0
+        if real_light>1: real_light=1
+        print(real_light, light)
 
-        #sprint(time.ticks_ms(), last+delay)
+        led.duty(int(1023*real_light))
+        for i in range(20):
+            pix[i] = (int(245*real_light)+2, 1, 1)
+        pix.write()
+
         if last and last+delay < time.ticks_ms():
-            print(time.ticks_ms(), last+delay)
-            led.value(0)
-            beep_pwm.duty(0)
             last = None
-            #print("DOWN")
+            print("DOWN")
+    
+        if not netm.isconnected():
+            print("Reconnecting...")
+            break
 
