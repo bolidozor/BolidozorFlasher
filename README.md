@@ -1,6 +1,7 @@
 # Bolidozor Flasher
 
 This project is a simple visual indicator shaped like the Bolidozor network logo. The blinker activates whenever a bolide is detected by one of the stations within the Bolidozor network.
+![obrazek](https://github.com/user-attachments/assets/56ce7f6a-ac22-4e70-a62d-664da8a0c2ee)
 
 ## Overview
 
