@@ -10,19 +10,21 @@ def rtbolidozor(pix, delay = 200, netm = None):
 
     delay = 1000
     #led = machine.Pin(33, machine.Pin.OUT)
-    led = machine.PWM(machine.Pin(33, machine.Pin.OUT), freq=1000)
-    led.freq(500)
-    led.duty(0)
+    #led = machine.PWM(machine.Pin(25, machine.Pin.OUT), freq=1000)
+    led = machine.Pin(25, machine.Pin.OUT)
+    led.toggle()
+    #led.freq(500)
+    #led.duty(0)
 
     time.sleep(1)
 
     last = time.ticks_ms()
 
 
-    beep = machine.Pin(18)
-    beep_pwm = machine.PWM(beep)
-    beep_pwm.freq(500)
-    beep_pwm.duty(0)
+    #beep = machine.Pin(18)
+    #beep_pwm = machine.PWM(beep)
+    #beep_pwm.freq(500)
+    #beep_pwm.duty(0)
 
     #delay = 5000;
     #with uwebsockets.client.connect('ws://rtbolidozor.astro.cz:80/ws') as websocket:
@@ -35,8 +37,9 @@ def rtbolidozor(pix, delay = 200, netm = None):
     a = uwebsockets.client.connect('ws://rtbolidozor.astro.cz/ws/')
     a.settimeout(0.01)
     print(a)
-    print(a.recv())
+    #print(a.recv())
     print("prvni prijem dat")
+
 
 
     last = 0
@@ -50,6 +53,7 @@ def rtbolidozor(pix, delay = 200, netm = None):
             #print('.')
         
         if data:
+            led.toggle()
             print('>>', data)
             last = time.ticks_ms()
             light += 1
@@ -69,9 +73,9 @@ def rtbolidozor(pix, delay = 200, netm = None):
         if real_light>1: real_light=1
         print(real_light, light)
 
-        led.duty(int(1023*real_light))
-        for i in range(20):
-            pix[i] = (int(245*real_light)+2, 1, 1)
+        #led.duty(int(1023*real_light))
+        for i in range(64):
+            pix[i] = (int(253*real_light)+2, int(128*light/3.0+1), int(128*light/3.0+1))
         pix.write()
 
         if last and last+delay < time.ticks_ms():

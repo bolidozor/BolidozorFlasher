@@ -7,7 +7,10 @@ import networks
 import machine
 import time
 
-pix = neopixel.NeoPixel(machine.Pin(32, machine.Pin.OUT), 20)
+from machine import Pin
+led = Pin(25, Pin.OUT)
+led.toggle()
+pix = neopixel.NeoPixel(machine.Pin(0, machine.Pin.OUT), 64)
 
 pix[0] = (255, 0, 0, 128)
 pix[1] = (0, 255, 0, 128)
@@ -22,25 +25,29 @@ print(networks.networks)
 
 while not sta_if.isconnected():
 
-    for i in range(20):
+    for i in range(64):
         pix[i] = (0, 10, 0)
     pix.write()
-
+    
     nts = sta_if.scan()
+    print(nts)
     for net in nts:
+        print("Selected", net)
         if net[0] in networks.networks:
+            #led.toggle()
             print("Pripojuji se k", net[0])
             sta_if.connect(net[0], networks.networks[net[0]])
             time.sleep(2)
-            break
+            #led.toggle()
+            #break
 
-    
     if sta_if.isconnected():
-        for i in range(20):
+        for i in range(64):
             pix[i] = (0, 0, 0)
         pix.write()
         try:
             print("Spoustim skript...")
+            #import client
             client.rtbolidozor(pix, 0, netm = sta_if)
             print("Skrpit skoncil...")
         except Exception as e:
