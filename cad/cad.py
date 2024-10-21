@@ -59,6 +59,12 @@ light.color = "white"
 cover = Box(82, 82, 18, align=(Align.CENTER, Align.CENTER, Align.MIN))
 cover += Pos(0, 0, 18-1)*Box(83, 83, 2, align=(Align.CENTER, Align.CENTER, Align.MIN))
 cover -= Pos(0, 0, 2) * Box(80-2, 80-2, 18, align=(Align.CENTER, Align.CENTER, Align.MIN))
+for x in [-49/2, 49/2]:
+    for y in [-51/2, 0, 51/2]:
+        cover += Pos(x, y, 0) * Cylinder(radius=2.5, height=6, align=(Align.CENTER, Align.CENTER, Align.MIN))
+        if y != 0:
+            cover -= Pos(x, y, 0) * Cylinder(radius=1, height=20, align=(Align.CENTER, Align.CENTER, Align.MIN))
+cover -= Cylinder(radius=2.5, height=2, align=(Align.CENTER, Align.CENTER, Align.MIN))
 cover = Pos(28+35, 28+35, -20) * cover
 cover.name = "cover"
 cover.color = "gray"
@@ -75,7 +81,8 @@ printb = pb.intersect(Pos(160-2, 50, 0)*printer)
 printb.color = "black"
 printb.label = "Bolidozor_case_part_b"
 
-show(printa, printb, light, cover, reset_camera=Camera.KEEP)
+show(cover, reset_camera=Camera.KEEP)
+#show(printa, printb, light, cover, reset_camera=Camera.KEEP)
 
 
 # %% 

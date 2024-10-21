@@ -61,6 +61,17 @@ def rtbolidozor(pix, delay = 200, netm = None):
             #beep_pwm.duty(int((2**10)*0.5))
             #print(last)
         
+        fromLast = time.ticks_ms() - last
+        black = int(fromLast / 250) % 64
+
+        for i in range(64):
+            pix[i] = (
+                int(min(255, max(0, 253 * real_light + 2))),
+                int(min(255, max(0, 128 * (light - 1) / 2.0 + 1))) if light > 1 else 0,
+                int(min(255, max(0, 128 * (light - 1) / 2.0 + 1))) if light > 1 else 0
+            )
+        pix[black] = (0, 0, 0)
+        pix.write()
         if light > 3:
             light = 3
         if light > 1:
