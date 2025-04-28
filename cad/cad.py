@@ -4,6 +4,11 @@ from ocp_vscode import *
 import copy
 
 
+multimaterial = True
+
+bac_cap_screw_positions = [(55, 15, 0), (55, 120, 0), (180, 95, 0), (180, 145, 0)]
+
+
 ca = import_svg("crop_a.svg")
 cb = import_svg("crop_b.svg")
 cc = import_svg("crop_c.svg")
@@ -19,21 +24,34 @@ fb = make_face(fb).scale(sc)
 fc = cc.wires()
 fc = make_face(fc).scale(sc)
 
-pbc = fa-fb+fc
+pbc = fa+fc
 
 
 ps = offset(fa, 2) - offset(fa, -0.5)
 ps = extrude(ps, amount=-30)
 
 pb = extrude(pbc, amount=-2)
-pb += Pos(63, 63, -1) * Box(82+3, 82+3, 4, align=(Align.CENTER, Align.CENTER, Align.MAX))
+pb -= extrude(fb, amount=-2)
+if multimaterial:
+    pb += extrude(fb, amount=-0.6)
+pb += extrude(fc, amount=-2)
+
+pb += Pos(63, 63, -1) * Box(82+3, 82+3, 5, align=(Align.CENTER, Align.CENTER, Align.MAX))
+for y in (-82/3, +82/3):
+    for x in ((82+12)/2-3, -(82+12)/2+3):
+        pb += Pos((x+63, y+63, 0)) * Cylinder(radius=5, height=19.5, align=(Align.CENTER, Align.CENTER, Align.MAX))
+        pb -= Pos((x+63, y+63, -3)) * Cylinder(radius=2/2, height=20, align=(Align.CENTER, Align.CENTER, Align.MAX))
+
 # Ramecek pro krabicku
-pb -= Pos(63, 63, -3-1) * Box(82.2, 82.2, 1, align=(Align.CENTER, Align.CENTER, Align.MAX))
+pb -= Pos(63, 63, -3-1) * Box(82.2, 82.2, 20, align=(Align.CENTER, Align.CENTER, Align.MAX))
 # Ramecek pro plexi
-pb -= Pos(63, 63, -1) * Box(70.2, 70.2, 5, align=(Align.CENTER, Align.CENTER, Align.MAX))
+pb -= Pos(63, 63, -1) * Box(70.2, 70.2, 20, align=(Align.CENTER, Align.CENTER, Align.MAX))
 
 pb += ps
-pb += Pos(160-2, 65, -1)*Box(4, 80, 10, align=(Align.CENTER, Align.MIN, Align.MAX))
+
+# Vyztuzovaci pricka
+pb += Pos(160-2, 65, -1)*Box(4, 80, 6, align=(Align.CENTER, Align.MIN, Align.MAX))
+pb += Pos(160-2, 65+35, -1)*Box(80, 4, 6, align=(Align.CENTER, Align.MIN, Align.MAX))
 
 
 # Pripevneni RP-PICO modulu do krabicky
@@ -41,31 +59,49 @@ rp_col = Cylinder(radius=3.8/2, height=10, align=(Align.CENTER, Align.CENTER, Al
 rp_col += Cylinder(radius=2.5,height=8, align=(Align.CENTER, Align.CENTER, Align.MAX))
 rp_col -= Cylinder(radius=2/2, height=10, align=(Align.CENTER, Align.CENTER, Align.MAX))
 
-col_set = Pos(11.4/2, 48.26/2, 0) * rp_col
-col_set += Pos(-11.4/2, -48.26/2, 0) * rp_col
-col_set += Pos(11.4/2, -48.26/2, 0) * rp_col
-col_set += Pos(-11.4/2, 48.26/2, 0) * rp_col
+col_set = Pos(11.4/2, 47/2, 0) * rp_col
+col_set += Pos(-11.4/2, -47/2, 0) * rp_col
+col_set += Pos(11.4/2, -47/2, 0) * rp_col
+col_set += Pos(-11.4/2, 47/2, 0) * rp_col
 
 col_set = Pos(100, 125, 0) * Rotation((0, 0, 90)) * col_set
 pb += col_set
 
 
-light = Pos(28+35, 28+35, 0) * Box(70, 70, 2, align=(Align.CENTER, Align.CENTER, Align.MAX))
-light -= pb
+for loc in bac_cap_screw_positions:
+    c = Cylinder(radius = 10/2, height=30, align=(Align.CENTER, Align.CENTER, Align.MAX))
+    c -= Cylinder(radius = 3.3/2, height=30, align=(Align.CENTER, Align.CENTER, Align.MAX))
+    c -= Pos(0,0,-(30-9))*Cylinder(radius = 4.1/2, height=30, align=(Align.CENTER, Align.CENTER, Align.MAX))
+
+    pb += Pos(*loc) * c
+
+
+
+light_thickness = 2
+
+light = Pos(28+35, 28+35, 0) * Box(70, 70, light_thickness, align=(Align.CENTER, Align.CENTER, Align.MAX))
+light -= scale(pb, (1,1,2 if multimaterial else 1))
 light.label = "pruzor"
 light.color = "white"
 
 
 cover = Box(82, 82, 18, align=(Align.CENTER, Align.CENTER, Align.MIN))
-cover += Pos(0, 0, 18-1)*Box(83, 83, 2, align=(Align.CENTER, Align.CENTER, Align.MIN))
 cover -= Pos(0, 0, 2) * Box(80-2, 80-2, 18, align=(Align.CENTER, Align.CENTER, Align.MIN))
+
+for y in (-82/3, +82/3):
+    cover += Pos((0, y, 0)) * Box(83+12, 6, 2, align=(Align.CENTER, Align.CENTER, Align.MIN))
+    for x in (-(82+12)/2+3, (82+12)/2-3):
+        cover -= Pos((x, y, 0)) * Cylinder(radius=3/2, height=4, align=(Align.CENTER, Align.CENTER, Align.MIN))
+
+# Otvory pro pripevneni LED svetel
 for x in [-49/2, 49/2]:
     for y in [-51/2, 0, 51/2]:
         cover += Pos(x, y, 0) * Cylinder(radius=2.5, height=6, align=(Align.CENTER, Align.CENTER, Align.MIN))
         if y != 0:
             cover -= Pos(x, y, 0) * Cylinder(radius=1, height=20, align=(Align.CENTER, Align.CENTER, Align.MIN))
+
 cover -= Cylinder(radius=2.5, height=2, align=(Align.CENTER, Align.CENTER, Align.MIN))
-cover = Pos(28+35, 28+35, -20) * cover
+cover = Pos(28+35, 28+35, -20-2) * cover
 cover.name = "cover"
 cover.color = "gray"
 
@@ -81,14 +117,17 @@ printb = pb.intersect(Pos(160-2, 50, 0)*printer)
 printb.color = "black"
 printb.label = "Bolidozor_case_part_b"
 
-show(cover, reset_camera=Camera.KEEP)
+#show(cover, reset_camera=Camera.KEEP)
 #show(printa, printb, light, cover, reset_camera=Camera.KEEP)
+
+#print(pb)
+show(pb, light, cover, reset_camera=Camera.KEEP)
 
 
 # %% 
 
 bc = fa
-bca = offset(bc, -0.5)
+bca = offset(bc, -1)
 bca = extrude(bca, amount=4)
 
 bcb = offset(bc, 1)
@@ -101,7 +140,14 @@ bcd = offset(bc, -6)
 bcd = extrude(bcd, amount=9, both=True)
 
 bc = (bca + bcb + bcc) - bcd
+
+for loc in bac_cap_screw_positions:
+    bc += Pos((0, 0, -10)) * Pos(*loc) * Cylinder(radius = 11/2, height=10, align=(Align.CENTER, Align.CENTER, Align.MIN))
+    bc -= Pos((0, 0, -10)) * Pos(*loc) * Cylinder(radius = 9/2, height=9, align=(Align.CENTER, Align.CENTER, Align.MIN))
+    bc -= Pos((0, 0, -10)) * Pos(*loc) * Cylinder(radius = 3.3/2, height=10, align=(Align.CENTER, Align.CENTER, Align.MIN))
+
 bc += Pos(160-2, 110, -5) * Box(4, 73, 5, align=(Align.CENTER, Align.CENTER, Align.MAX))
+bc += Pos(110, 110, -5) * Box(150, 4, 5, align=(Align.CENTER, Align.CENTER, Align.MAX))
 bc = Pos(0, 0, -30) * bc
 bc.color = "white"
 bc.label = "Back cover"
@@ -118,13 +164,21 @@ printbb.label = "Bolidozor_back_part_b"
 show(printa, printb, light, cover, printba, printbb, reset_camera=Camera.KEEP)
 
 # %%
-export_stl(printa, "outer_model_a.stl")
-export_stl(printb, "outer_model_b.stl")
-export_stl(light, "light_model.stl")
+
+if not multimaterial:
+    export_stl(printa, "outer_model_a.stl")
+    export_stl(printb, "outer_model_b.stl")
+    export_stl(light, "light_model.stl")
+else:
+    export_stl(pb, "multimaterial_outer_model.stl")
+    export_stl(light, "multimaterial_light_model.stl")
 export_stl(cover, "cover_model.stl")
 
-export_stl(printba, "back_model_a.stl")
-export_stl(printbb, "back_model_b.stl")
+if not multimaterial:
+    export_stl(printba, "back_model_a.stl")
+    export_stl(printbb, "back_model_b.stl")
+else:
+    export_stl(bc, "multimaterial_back_model.stl")
 
 
 # %% 

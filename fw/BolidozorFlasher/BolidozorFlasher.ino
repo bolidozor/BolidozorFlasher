@@ -25,7 +25,6 @@ WiFiConfig wifiConfigs[MAX_NETWORKS];
 int savedNetworks = 0;
 
 
-
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 WebSocketsClient webSocket;
@@ -38,17 +37,40 @@ float light = 1;
 
 void setup() {
 
-  LittleFS.begin();
-
   Serial.begin(115200);
-  while(!Serial);
-  last = millis();
 
-  loadConfig();
-  
   pixels.begin();
   pixels.clear();
   pixels.show();
+
+
+  for(int n=0; n<5; n++){
+  for (int i = 0; i < NUMPIXELS; i++) {
+    uint8_t red = 255;
+    uint8_t green = 255;
+    uint8_t blue = 0;
+    pixels.setPixelColor(i, pixels.Color(red, green, blue));
+    pixels.show();
+    delay(1);
+  }
+  delay(200);
+  for (int i = 0; i < NUMPIXELS; i++) {
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+    pixels.setPixelColor(i, pixels.Color(red, green, blue));
+    pixels.show();
+    delay(1);
+  }
+  delay(200);
+  }
+  
+
+
+  last = millis();
+
+  LittleFS.begin();
+  loadConfig();
 
   //animateStart();
 
@@ -61,7 +83,6 @@ void setup() {
       Serial.printf("Added network: %s\n", wifiConfigs[i].ssid);
     }
   }
-
   
   Serial.print("Connecting to WiFi network...");
 
@@ -85,12 +106,31 @@ void setup() {
     webSocket.setReconnectInterval(1000);
     webSocket.enableHeartbeat(5000, 500, 5);
       
-    Serial.println("\Connected to websocket!");
+    Serial.println("Connected to websocket!");
     //animateConnected();
   
+    for(int n=0; n<5; n++){
+    for (int i = 0; i < NUMPIXELS; i++) {
+      uint8_t red = 255;
+      uint8_t green = 100;
+      uint8_t blue = 0;
+      pixels.setPixelColor(i, pixels.Color(red, green, blue));
+      pixels.show();
+      delay(1);
+    }
+    delay(200);
+    for (int i = 0; i < NUMPIXELS; i++) {
+      uint8_t red = 100;
+      uint8_t green = 0;
+      uint8_t blue = 0;
+      pixels.setPixelColor(i, pixels.Color(red, green, blue));
+      pixels.show();
+      delay(1);
+    }
+    delay(200);
+  }
+  
 }
-
-
 
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
@@ -133,7 +173,6 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 
 void loop() {
-
 
   if(!WiFi.isConnected()){
     Serial.println("Disconnected...");
@@ -181,7 +220,7 @@ void serialLoop(){
     if (command.equalsIgnoreCase("conf")) {
       showMenu();
     } else {
-      //Serial.println("Unknown cmd. Použijte 'conf' pro konfiguraci.");
+      Serial.println("Unknown cmd. Try 'conf' for configuration.");
       last = millis();
       light += 1;
     }
