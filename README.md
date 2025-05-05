@@ -20,12 +20,28 @@ There may be slight delays in data delivery. Experimentally, the typical delay h
 
 ## Configuration
 
-The device supports up to 10 Wi-Fi networks, which can be configured over a serial connection. Configuration is saved persistently.
+The device supports up to 10 Wi-Fi networks, which can be configured over a serial connection. Configuration is saved persistently after sending `write` command. 
 
-### 📡 Connecting to Wi-Fi
+## Serial Commands
+
+| Command              | Description                                      |
+|----------------------|--------------------------------------------------|
+| `conf`               | Enter configuration menu                         |
+| `met`                | Simulate a meteor event (manually flash)         |
+| `W<X>S=SSID`         | Set SSID for network `X` (0–9)                   |
+| `W<X>P=PASSWORD`     | Set password for network `X`                     |
+| `W<X>E=0/1`          | Enable (`1`) or disable (`0`) network `X`        |
+| `save`               | Save configuration to internal storage           |
+| `show`               | Print currently configured networks              |
+| `reboot`             | Reboot the device (currently disabled)           |
+| `exit`               | Exit configuration mode                          |
+| `help`               | Display help inside configuration mode           |
+
+
+### 📡 Setting a Wi-Fi networ
 
 1. Connect the device to your computer via USB.
-2. Open a serial terminal
+2. Open a serial terminal software (see note bellow)
 3. Type the following command to enter configuration mode:
    ```
    conf
@@ -51,24 +67,13 @@ The device supports up to 10 Wi-Fi networks, which can be configured over a seri
 
 > You can configure multiple networks (W0–W9). The device will attempt to connect to any enabled network.
 
----
+> Terminal software: To configure the device correctly via the serial interface, it is important to use a terminal program that sends the entire command at once, rather than character-by-character. Recommended one is CuteCom  or the Arduino Serial Monitor, which accepts line-based input.
+> 
+> Terminals that operate in Raw Mode, such as picocom, minicom, or other similar tools, are not suitable. These terminals send each character immediately as you type it, which can cause the device to misinterpret commands. If you prefer to use such a terminal anyway, you can still make it work by preparing your full command in advance and pasting it into the terminal (e.g., using Ctrl+V), so that it is transmitted as a single message.
 
-## Serial Commands
-
-| Command              | Description                                      |
-|----------------------|--------------------------------------------------|
-| `conf`               | Enter configuration menu                         |
-| `met`                | Simulate a meteor event (manually flash)         |
-| `W<X>S=SSID`         | Set SSID for network `X` (0–9)                   |
-| `W<X>P=PASSWORD`     | Set password for network `X`                     |
-| `W<X>E=0/1`          | Enable (`1`) or disable (`0`) network `X`        |
-| `save`               | Save configuration to internal storage           |
-| `show`               | Print currently configured networks              |
-| `reboot`             | Reboot the device (currently disabled)           |
-| `exit`               | Exit configuration mode                          |
-| `help`               | Display help inside configuration mode           |
 
 ---
+
 
 ## Data Source
 
